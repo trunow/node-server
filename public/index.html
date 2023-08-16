@@ -32,9 +32,10 @@
     <pre id="log"></pre>
 
     <script>
-        console.log((new Date).toJSON().slice(11, 19));
+        // console.log((new Date).toJSON().slice(11, 19));
 
-        const form = document.querySelector('#form');
+        const form = document.querySelector('#form'),
+            url = form.action;
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -48,7 +49,7 @@
             });
 
             fetch(
-                    form.action, 
+                    url, 
                     {
                         method: form.method, 
                         body: JSON.stringify(Object.fromEntries(new FormData(form))),
@@ -83,7 +84,7 @@
         });
 
         // список всего - в консоль
-        fetch('stat?secret=1').then(r => r.json()).then(console.log)
+        fetch(url + '?secret=1').then(r => r.json()).then(console.log)
     </script>
     
 </body>

@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 const express = require("express");
-
 const app = express();
 
 app.use(express.static("public"));
@@ -12,9 +11,6 @@ const cors = require("cors");
 const db = require("./db/db.js");
 app.use(cors({ origin: "*" }));
 
-
-// создаем парсер для данных application/x-www-form-urlencoded
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get("/stat", (req, res) => {
@@ -50,7 +46,7 @@ app.post("/stat", (req, res) => {
     if(String(parseInt(data.field2))!==data.field2) errors.field2 = 'Тут только цифры';
     
     if(Object.values(errors).length) {
-        return res.status(403).json({errors})
+        return res.status(422).json({errors})
     }
 
     // create new item in DB
@@ -70,11 +66,12 @@ app.post("/stat", (req, res) => {
 
 });
 
+/** [СТОП] */
 /** КОД ВЫШЕ НЕ НУЖЕН ДЛЯ СЕРВЕРА С ФОРМОЙ */
 /** КОД НИЖЕ НУЖЕН ВСЕМ */
 
 // Запускаем сервер
-const port = process.env.PORT ?? 3003;
+const port = process.env.PORT ?? 3003; // ПОРТ!
 
 app.listen(port, () => {
 	console.log(`http://127.0.0.1:${port}`);
