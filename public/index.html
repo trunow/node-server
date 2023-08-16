@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAT</title>
+
+    <style>
+        [data-error] {
+            color: red;
+        }
+        [data-error]::before {
+            content: attr(data-error);
+        }
+        input {
+            border: 1px solid currentColor;
+        }
+    </style>
+</head>
+<body>
+    <form id="form" action="/stat" method="POST" enctype="application/x-www-form-urlencoded">
+        <label>
+            <input name="field1"/>
+        </label>
+        <br/>
+        <label>
+            <input name="field2"/>
+        </label>
+        <br/>
+        <button type="submit">Send</button>
+    </form>
+    <pre id="log"></pre>
+
+    <script>
+        console.log((new Date).toJSON().slice(11, 19));
+
+        const form = document.querySelector('#form');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const log = document.querySelector('#log');
+
+            // clear errors
+            [...form.elements].forEach(inp => {
+                const lbl = inp?.parentElement;
+                if(lbl) lbl.removeAttribute('data-error');
+            });
+
+            fetch(
+                    form.action, 
+                    {
+                        method: form.method, 
+                        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
+                .then(r => r.json())
+                .then(j => {
+
+                    const errorKeys = Object.keys(j.errors);
+                    
+                    if(errorKeys?.length) {
+                        console.warn(errorKeys);
+
+                        errorKeys.forEach(ekey => {
+                            const inp = form.elements[ekey],
+                                lbl = inp?.parentElement;
+                            if(lbl) lbl.dataset.error = j.errors[ekey];
+                        });
+                    }
+                    else {
+                        // OK
+                        log.textContent = JSON.stringify(j);
+                    }
+                })
+                .catch(console.warn);
+
+            return false;
+
+        });
+
+        // список всего - в консоль
+        fetch('stat?secret=1').then(r => r.json()).then(console.log)
+    </script>
+    
+</body>
+</html>
